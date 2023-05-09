@@ -3,16 +3,17 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
-#[ORM\Entity(repositoryClass: UserRepository::class)]
 #[UniqueEntity('email')]
-
+#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\EntityListeners(['App\EntityListener\UserListener'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -44,7 +45,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank()]
     private string $password = 'password';
 
+    
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Ingredient::class, orphanRemoval: true)]
+    private $ingredients;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Recipe::class, orphanRemoval: true)]
+    private $recipes;
+
+    
+
+    public function __construct()
+    {
+        
+        $this->ingredients = new ArrayCollection();
+        $this->recipes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -159,4 +175,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
+    
+
+    
+
+   
+    
 }

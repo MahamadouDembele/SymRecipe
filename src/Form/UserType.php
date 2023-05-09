@@ -2,19 +2,17 @@
 
 namespace App\Form;
 
-use App\Entity\Contact;
+use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3;
 
-class ContactType extends AbstractType
+class UserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -28,68 +26,47 @@ class ContactType extends AbstractType
                 'label' => 'Nom / Prénom',
                 'label_attr' => [
                     'class' => 'form-label  mt-4'
-                ]
-            ])
-            ->add('email', EmailType::class, [
-                'attr' => [
-                    'class' => 'form-control',
-                    'minlenght' => '2',
-                    'maxlenght' => '180',
-                ],
-                'label' => 'Adresse email',
-                'label_attr' => [
-                    'class' => 'form-label  mt-4'
                 ],
                 'constraints' => [
                     new Assert\NotBlank(),
-                    new Assert\Email(),
-                    new Assert\Length(['min' => 2, 'max' => 180])
+                    new Assert\Length(['min' => 2, 'max' => 50])
                 ]
             ])
-            ->add('subject', TextType::class, [
+            ->add('pseudo', TextType::class, [
                 'attr' => [
                     'class' => 'form-control',
                     'minlenght' => '2',
-                    'maxlenght' => '100',
+                    'maxlenght' => '50',
                 ],
-                'label' => 'Sujet',
+                'required' => false,
+                'label' => 'Pseudo (Facultatif)',
                 'label_attr' => [
                     'class' => 'form-label  mt-4'
                 ],
                 'constraints' => [
-                    new Assert\Length(['min' => 2, 'max' => 100])
+                    new Assert\Length(['min' => 2, 'max' => 50])
                 ]
             ])
-            ->add('message', TextareaType::class, [
+            ->add('plainPassword', PasswordType::class, [
                 'attr' => [
-                    'class' => 'form-control',
+                    'class' => 'form-control'
                 ],
-                'label' => 'Message',
+                'label' => 'Mot de passe',
                 'label_attr' => [
-                    'class' => 'form-label mt-4'
-                ],
-                'constraints' => [
-                    new Assert\NotBlank()
+                    'class' => 'form-label  mt-4'
                 ]
             ])
             ->add('submit', SubmitType::class, [
                 'attr' => [
                     'class' => 'btn btn-primary mt-4'
-                ],
-                'label' => 'Soumettre ma demande'
+                ]
             ]);
-
-            /*->add('captcha', Recaptcha3Type::class, [
-                'constraints' => new Recaptcha3(['message' => 'There were problems with your captcha. Please try again or contact with support and provide following code(s): {{ errorCodes }}']),
-                'action_name' => 'contact',
-            ]);*/
-
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Contact::class,
+            'data_class' => User::class,
         ]);
     }
 }

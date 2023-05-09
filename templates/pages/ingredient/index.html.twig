@@ -12,6 +12,9 @@
 		{% endfor %}
 
 			<h1>Mes ingrédients</h1>
+			<a href="{{ path('recipe.new') }}" class="btn btn-primary">
+				Créer un engredient
+			</a>
 
 			<div class="count mt-4">Il y a
 				{{ ingredients.getTotalItemCount }}
@@ -41,7 +44,7 @@
 								<a href="{{ path('ingredient.edit', { id: ingredient.id }) }}" class="btn btn-info">Modifier</a>
 							</td>
 							<td>
-								<a href="{{ path('ingredient.delete', { id: ingredient.id }) }}" class="btn btn-warning">Supprimer</a>
+								<a href="" class="btn btn-warning">Supprimer</a>
 							</td>
 						</tr>
 					{% endfor %}
