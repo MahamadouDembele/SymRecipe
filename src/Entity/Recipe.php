@@ -2,19 +2,19 @@
 
 namespace App\Entity;
 
-use DateTimeImmutable;
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\RecipeRepository;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
-
-
-#[ORM\Entity(repositoryClass: RecipeRepository::class)]
 #[UniqueEntity('name')]
-
+#[ORM\HasLifecycleCallbacks]
+#[ORM\Entity(repositoryClass: RecipeRepository::class)]
+#[Vich\Uploadable]
 class Recipe
 {
     #[ORM\Id]
@@ -26,7 +26,6 @@ class Recipe
     #[Assert\NotBlank()]
     #[Assert\Length(min: 2, max: 50)]
     private string $name;
-
 
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Assert\Positive()]
@@ -55,15 +54,37 @@ class Recipe
     #[ORM\Column(type: 'boolean')]
     private bool $isFavorite;
 
+    #[ORM\Column(type: 'boolean')]
+    private $isPublic = false;
 
+    #[ORM\Column(type: 'datetime_immutable')]
+    #[Assert\NotNull()]
+    private \DateTimeImmutable $createdAt;
+
+    #[ORM\Column(type: 'datetime_immutable')]
+    #[Assert\NotNull()]
+    private \DateTimeImmutable $updatedAt;
 
     #[ORM\ManyToMany(targetEntity: Ingredient::class)]
     private $ingredients;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'recipes')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $user;
 
 
     public function __construct()
     {
         $this->ingredients = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable;
+        $this->updatedAt = new \DateTimeImmutable();
+       
+    }
+
+    #[ORM\PrePersist()]
+    public function setUpdatedAtValue()
+    {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -82,6 +103,7 @@ class Recipe
 
         return $this;
     }
+
 
     public function getTime(): ?int
     {
@@ -143,7 +165,7 @@ class Recipe
         return $this;
     }
 
-    public function isIsFavorite(): ?bool
+    public function getIsFavorite(): ?bool
     {
         return $this->isFavorite;
     }
@@ -155,10 +177,44 @@ class Recipe
         return $this;
     }
 
-   
+    public function getIsPublic(): ?bool
+    {
+        return $this->isPublic;
+    }
+
+    public function setIsPublic(bool $isPublic): self
+    {
+        $this->isPublic = $isPublic;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
 
     /**
-     * @return Collection<int, Ingredient>
+     * @return Collection|Ingredient[]
      */
     public function getIngredients(): Collection
     {
@@ -168,7 +224,7 @@ class Recipe
     public function addIngredient(Ingredient $ingredient): self
     {
         if (!$this->ingredients->contains($ingredient)) {
-            $this->ingredients->add($ingredient);
+            $this->ingredients[] = $ingredient;
         }
 
         return $this;
@@ -180,4 +236,21 @@ class Recipe
 
         return $this;
     }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    
+
+
+    
 }

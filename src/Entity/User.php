@@ -53,6 +53,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Recipe::class, orphanRemoval: true)]
     private $recipes;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Ingredient::class, orphanRemoval: true)]
+    private Collection $Ingredients;
+
     
 
     public function __construct()
@@ -60,6 +63,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         
         $this->ingredients = new ArrayCollection();
         $this->recipes = new ArrayCollection();
+        $this->Ingredients = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -173,6 +177,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, Ingredient>
+     */
+    public function getIngredients(): Collection
+    {
+        return $this->Ingredients;
+    }
+
+    public function addIngredient(Ingredient $ingredient): self
+    {
+        if (!$this->Ingredients->contains($ingredient)) {
+            $this->Ingredients->add($ingredient);
+            $ingredient->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIngredient(Ingredient $ingredient): self
+    {
+        if ($this->Ingredients->removeElement($ingredient)) {
+            // set the owning side to null (unless already changed)
+            if ($ingredient->getUser() === $this) {
+                $ingredient->setUser(null);
+            }
+        }
+
+        return $this;
     }
 
     

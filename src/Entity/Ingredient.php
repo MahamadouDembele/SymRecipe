@@ -3,11 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\IngredientRepository;
-use Doctrine\ORM\Mapping as ORM;
 use DateTimeImmutable;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
-
 
 #[ORM\Entity(repositoryClass: IngredientRepository::class)]
 #[UniqueEntity('name')]
@@ -33,6 +32,10 @@ class Ingredient
     #[Assert\NotNull()]
     private ?DateTimeImmutable $createdAt;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'ingredients')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $user;
+
     /**
      * Constructor
      */
@@ -40,7 +43,6 @@ class Ingredient
     {
         $this->createdAt = new \DateTimeImmutable();
     }
-
 
     public function getId(): ?int
     {
@@ -82,10 +84,21 @@ class Ingredient
 
         return $this;
     }
+
     public function __toString()
     {
         return $this->name;
     }
 
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
 
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
 }

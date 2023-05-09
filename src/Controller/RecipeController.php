@@ -31,7 +31,7 @@ class RecipeController extends AbstractController
         ]);
     }
 
-    #[Route('/recette/creation', name:'recipe.new', methods: ['GET', 'POST'])]
+    #[Route('/recette/creation', 'recipe.new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $manager): Response
     {
         $recipe = new Recipe();
@@ -40,6 +40,7 @@ class RecipeController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $recipe = $form->getData();
+            $recipe->setUser($this->getUser());
 
             $manager->persist($recipe);
             $manager->flush();
@@ -56,6 +57,7 @@ class RecipeController extends AbstractController
             'form' => $form->createView()
         ]);
     }
+
     #[Route('/recette/edition/{id}', 'recipe.edit', methods: ['GET', 'POST'])]
     public function edit(
         Recipe $recipe,
