@@ -31,6 +31,7 @@
 						<th scope="col">Nom</th>
 						<th scope="col">Prix</th>
 						<th scope="col">Difficulté</th>
+                        <th scope="col">Date de création</th>
                         <th scope="col">Edition</th>
 						<th scope="col">Suppresion</th>
 						<th scope="col">Vision</th>
@@ -56,6 +57,7 @@
 									{{ recipe.difficulty }}
 								{% endif %}
 							</td>
+							<td>{{ recipe.createdAt|date('d/m/Y') }}</td>
                             <td>
 								<a href="{{ path('recipe.edit', { id: recipe.id }) }}" class="btn btn-primary">Modifier</a>
 							</td>

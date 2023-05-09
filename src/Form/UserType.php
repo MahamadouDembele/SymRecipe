@@ -39,7 +39,7 @@ class UserType extends AbstractType
                     'maxlenght' => '50',
                 ],
                 'required' => false,
-                'label' => 'Pseudo (Facultatif)',
+                'label' => 'Adresse mail',
                 'label_attr' => [
                     'class' => 'form-label  mt-4'
                 ],

@@ -18,6 +18,7 @@ class IngredientController extends AbstractController
 {
     
     #[Route('/ingredient', name: 'ingredient.index', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function index(
         IngredientRepository $repository,
         PaginatorInterface $paginator,
@@ -36,6 +37,7 @@ class IngredientController extends AbstractController
 
     
     #[Route('/ingredient/creation', 'ingredient.new')]
+    #[IsGranted('ROLE_USER')]
     public function new(
         Request $request,
         EntityManagerInterface $manager
@@ -64,7 +66,8 @@ class IngredientController extends AbstractController
         ]);
     }
 
-    
+   
+    #[Security("is_granted('ROLE_USER') and user === ingredient.getUser()")]
     #[Route('/ingredient/edition/{id}', 'ingredient.edit', methods: ['GET', 'POST'])]
     public function edit(
         Ingredient $ingredient,
@@ -93,8 +96,9 @@ class IngredientController extends AbstractController
         ]);
     }
 
-   
+    
     #[Route('/ingredient/suppression/{id}', 'ingredient.delete', methods: ['GET'])]
+    #[Security("is_granted('ROLE_USER') and user === ingredient.getUser()")]
     public function delete(
         EntityManagerInterface $manager,
         Ingredient $ingredient

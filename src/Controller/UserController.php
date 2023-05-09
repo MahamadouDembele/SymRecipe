@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 class UserController extends AbstractController
 {
     
+    #[Security("is_granted('ROLE_USER') and user === choosenUser")]
     #[Route('/utilisateur/edition/{id}', name: 'user.edit', methods: ['GET', 'POST'])]
     public function edit(
         User $choosenUser,
@@ -52,7 +53,8 @@ class UserController extends AbstractController
         ]);
     }
 
-
+   
+    #[Security("is_granted('ROLE_USER') and user === choosenUser")]
     #[Route('/utilisateur/edition-mot-de-passe/{id}', 'user.edit.password', methods: ['GET', 'POST'])]
     public function editPassword(
         User $choosenUser,
@@ -65,7 +67,7 @@ class UserController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             if ($hasher->isPasswordValid($choosenUser, $form->getData()['plainPassword'])) {
-               // $choosenUser->setUpdatedAt(new \DateTimeImmutable());
+                $choosenUser->setUpdatedAt(new \DateTimeImmutable());
                 $choosenUser->setPlainPassword(
                     $form->getData()['newPassword']
                 );
@@ -87,7 +89,7 @@ class UserController extends AbstractController
             }
         }
 
-        return $this->render('user/edit.password.html.twig', [
+        return $this->render('user/edit_password.html.twig', [
             'form' => $form->createView()
         ]);
     }
