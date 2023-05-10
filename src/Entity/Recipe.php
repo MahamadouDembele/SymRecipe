@@ -27,6 +27,12 @@ class Recipe
     #[Assert\Length(min: 2, max: 50)]
     private string $name;
 
+    #[Vich\UploadableField(mapping: 'recipe_images', fileNameProperty: 'imageName')]
+    private ?File $imageFile = null;
+
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $imageName = null;
+
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Assert\Positive()]
     #[Assert\LessThan(1441)]
@@ -72,13 +78,17 @@ class Recipe
     #[ORM\JoinColumn(nullable: false)]
     private $user;
 
+    #[ORM\OneToMany(mappedBy: 'recipe', targetEntity: Mark::class, orphanRemoval: true)]
+    private $marks;
+
+    private ?float $average = null;
 
     public function __construct()
     {
         $this->ingredients = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable;
         $this->updatedAt = new \DateTimeImmutable();
-       
+        $this->marks = new ArrayCollection();
     }
 
     #[ORM\PrePersist()]
@@ -104,6 +114,12 @@ class Recipe
         return $this;
     }
 
+    
+
+    public function getImageName(): ?string
+    {
+        return $this->imageName;
+    }
 
     public function getTime(): ?int
     {
@@ -249,8 +265,56 @@ class Recipe
         return $this;
     }
 
-    
+    /**
+     * @return Collection|Mark[]
+     */
+    public function getMarks(): Collection
+    {
+        return $this->marks;
+    }
+
+    public function addMark(Mark $mark): self
+    {
+        if (!$this->marks->contains($mark)) {
+            $this->marks[] = $mark;
+            $mark->setRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMark(Mark $mark): self
+    {
+        if ($this->marks->removeElement($mark)) {
+            // set the owning side to null (unless already changed)
+            if ($mark->getRecipe() === $this) {
+                $mark->setRecipe(null);
+            }
+        }
+
+        return $this;
+    }
 
 
-    
+    /**
+     * Get the value of average
+     */
+    public function getAverage()
+    {
+        $marks = $this->marks;
+
+        if ($marks->toArray() === []) {
+            $this->average = null;
+            return $this->average;
+        }
+
+        $total = 0;
+        foreach ($marks as $mark) {
+            $total += $mark->getMark();
+        }
+
+        $this->average = $total / count($marks);
+
+        return $this->average;
+    }
 }

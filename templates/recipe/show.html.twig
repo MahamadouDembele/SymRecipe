@@ -23,6 +23,11 @@
 				{{ recipe.createdAt|date('d/m/Y') }}</span>
 		</div>
 
+		<p>La moyenne de cette recette est de
+			{{ recipe.average|number_format(2, '.', ',') }}
+			/5</p>
+
+
 		<div class="mt-4">
 			{% if recipe.time %}
 				<p>Temps (en minute) :
@@ -71,6 +76,12 @@
 				<span class="badge bg-primary">{{ ingredient.name }}</span>
 			{% endfor %}
 		</div>
+
+		<div class="mark">
+			{{ form(form) }}
+			</div>
+
+
 
 		
 	{% endblock %}
